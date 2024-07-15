@@ -1,0 +1,210 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_SDAMANAGER",
+      "label": "SDAManager",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "mysql",
+      "pluginName": "MySQL"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.4.1"
+    },
+    {
+      "type": "datasource",
+      "id": "mysql",
+      "name": "MySQL",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "mysql",
+        "uid": "${DS_SDAMANAGER}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "links": [
+            {
+              "targetBlank": true,
+              "title": "WorkerLogs",
+              "url": "http://192.168.2.130:10003/d/f3670fe7-60c3-4267-b3a8-2ea5f910a83f/worker-logs?orgId=1&&var-WorkerFilePath=/home/moreh/logs/frontend/moreh_worker.${__data.fields.fe_id}.log&var-FrontendID=${__data.fields.fe_id}"
+            }
+          ],
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "status"
+            },
+            "properties": [
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "CANCELED": {
+                        "color": "yellow",
+                        "index": 2
+                      },
+                      "EXPIRED": {
+                        "color": "red",
+                        "index": 3
+                      },
+                      "NOT_ENOUGH_GPU": {
+                        "color": "purple",
+                        "index": 0
+                      },
+                      "RUNNING": {
+                        "color": "green",
+                        "index": 1
+                      },
+                      "WORKER_ERROR": {
+                        "color": "red",
+                        "index": 4
+                      }
+                    },
+                    "type": "value"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 37,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "10.4.1",
+      "targets": [
+        {
+          "dataset": "moreh_master",
+          "datasource": {
+            "type": "mysql",
+            "uid": "${DS_SDAMANAGER}"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "select\n  status,\n  fe_id,\n  TokenID,\n  case\n    when end_time = \"\" then TIMESTAMPDIFF(MINUTE, timestamp(start_time), NOW())\n    else TIMESTAMPDIFF(MINUTE, timestamp(start_time), timestamp(end_time))\n  end as \"elsp_t\",\n  convert_tz(start_time, \"Asia/Seoul\", \"UTC\") as \"start_time\",\n  convert_tz(end_time, \"Asia/Seoul\", \"UTC\") as \"end_time\",\n  MAF_Version as ver,\n  framework,\n  SDAModel,\n  proc_name,\n  BACKNODE\nfrom (\n  select *\n  from (\n    SELECT\n      request_time AS \"time\",\n      fe_id,\n      token_name as TokenName,\n      token as TokenID,\n      version as \"MAF_Version\",\n      client_info as \"framework\",\n      proc_name,\n      JobStatus.status as status,\n      start_time,\n      end_time,\n      device_count,\n      SDAModel.name as SDAModel,\n      REGEXP_REPLACE(REGEXP_REPLACE(device_info, '\",\"devices\":\\\\[[0-9,]*|\\\\},\\\\{',' '), '[{}\":]|device_info|host|\\\\[|\\\\]','') as BACKNODE\n    FROM JobHistory\n    LEFT JOIN JobStatus ON JobStatus.id = JobHistory.stat_id\n    LEFT JOIN SDAModel ON JobHistory.device_count = SDAModel.devices\n    where request_time is not null) as A\n  union all\n  select *\n  from (\n    select \n      time,\n      fe_id,\n      TokenName,\n      TokenID,\n      MAF_Version,\n      framework,\n      proc_name,\n      status,\n      start_time,\n      end_time,\n      device_count,\n      SDAModel,\n      group_concat(distinct backend) as BACKNODE\n  from (\n    select\n      request_time as \"time\",\n      JobQueue.fe_id,\n      Token.name as TokenName,\n      Token.id as TokenID,\n      version as \"MAF_Version\",\n      client_info as \"framework\",\n      proc_name,\n      start_time,\n      \"\" as end_time,\n      JobQueue.stat_id,\n      JobStatus.status as status,\n      device_count,\n      SDAModel.name as SDAModel,\n      Backend.host as backend\n    from JobQueue\n    LEFT JOIN Device ON Device.fe_id = JobQueue.fe_id\n    LEFT JOIN SDA ON JobQueue.sda_id = SDA.id\n    LEFT JOIN Token ON SDA.tok_id = Token.id\n    LEFT JOIN Backend on Device.be_id = Backend.id\n    LEFT JOIN JobStatus ON JobStatus.id = JobQueue.stat_id\n    LEFT JOIN SDAModel ON JobQueue.device_count = SDAModel.devices) as A\n    group by 1,2,3,4,5,6,7,8,9,10,11) as B) as C\nwhere time is not null and $__timeFilter(time) and status not in (\"NOT_ENOUGH_GPU\", \"QUEUED\")\norder by time desc",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "Job History",
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Job History",
+  "uid": "d1a2920e-0e62-4d61-ade5-643849e48738",
+  "version": 4,
+  "weekStart": ""
+}
