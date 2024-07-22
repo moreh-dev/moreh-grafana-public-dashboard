@@ -1,41 +1,4 @@
 {
-  "__inputs": [
-    {
-      "name": "DS_SDAMANAGER",
-      "label": "SDAManager",
-      "description": "",
-      "type": "datasource",
-      "pluginId": "mysql",
-      "pluginName": "MySQL"
-    }
-  ],
-  "__elements": {},
-  "__requires": [
-    {
-      "type": "grafana",
-      "id": "grafana",
-      "name": "Grafana",
-      "version": "10.4.1"
-    },
-    {
-      "type": "datasource",
-      "id": "mysql",
-      "name": "MySQL",
-      "version": "1.0.0"
-    },
-    {
-      "type": "panel",
-      "id": "stat",
-      "name": "Stat",
-      "version": ""
-    },
-    {
-      "type": "panel",
-      "id": "table",
-      "name": "Table",
-      "version": ""
-    }
-  ],
   "annotations": {
     "list": [
       {
@@ -55,14 +18,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": null,
+  "id": 4,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -169,72 +132,12 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "SELECT sum(device_count) as AvailableDevices\r\nFROM ( SELECT \r\n    Backend.id as be_id, count(Device.id) as device_count\r\n  FROM Device\r\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\r\n  LEFT JOIN Backend on Device.be_id = Backend.id\r\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\r\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\r\n  WHERE\r\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\r\n  GROUP BY Backend.id\r\n) AS A",
-          "refId": "C",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "dataset": "moreh_master",
-          "datasource": {
-            "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": " SELECT \r\n    coalesce(count(distinct Device.id), 0) as RunningDevices\r\n  FROM Device\r\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\r\n  LEFT JOIN Backend on Device.be_id = Backend.id\r\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\r\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\r\n  WHERE\r\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"PROCESSING\" and BackendGroup.name in ($BackendGroup)",
-          "refId": "B",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "dataset": "moreh_master",
-          "datasource": {
-            "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "  select coalesce(sum(nodes_count), 0) * 8 as ShutDownDevices\n  from (\n    select BackNode, status, case when sum(nodes) > 1 then 1 else sum(nodes) end as nodes_count\n    from (\n      SELECT distinct concat(\"back\", LPAD(be_id, 3, '0')) as BackNode,\n      Device.idx, 0.125 as nodes, status\n      FROM Device\n      LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n      LEFT JOIN Backend ON Device.be_id = Backend.id\n      LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n      WHERE BackendGroup.name in ($BackendGroup)) as A\n    group by 1,2\n    having status = 'SHUTDOWN'\n    UNION\n    select distinct host as BackNode, status, 1 as nodes_count\n    from Backend\n    LEFT JOIN BackendStatus ON Backend.stat_id = BackendStatus.id\n    LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n    where status = 'SHUTDOWN' and BackendGroup.name in ($BackendGroup)) as B\n",
+          "rawSql": "SELECT sum(device_count) as AvailableDevices\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
           "refId": "A",
           "sql": {
             "columns": [
@@ -260,7 +163,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -309,7 +212,7 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
@@ -341,7 +244,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -448,72 +351,12 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": "SELECT sum(CASE WHEN device_count >= 8 THEN 1 ELSE 0 END) as StandbyNodes\r\nFROM ( SELECT \r\n    Backend.id as be_id, count(Device.id) as device_count\r\n  FROM Device\r\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\r\n  LEFT JOIN Backend on Device.be_id = Backend.id\r\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\r\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\r\n  WHERE\r\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\r\n  GROUP BY Backend.id\r\n) AS A",
-          "refId": "C",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "dataset": "moreh_master",
-          "datasource": {
-            "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "hide": false,
-          "rawQuery": true,
-          "rawSql": " SELECT \r\n    coalesce(count(distinct Backend.id), 0) as RunningNodes\r\n  FROM Device\r\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\r\n  LEFT JOIN Backend on Device.be_id = Backend.id\r\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\r\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\r\n  WHERE\r\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"PROCESSING\" and BackendGroup.name in ($BackendGroup)",
-          "refId": "B",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        },
-        {
-          "dataset": "moreh_master",
-          "datasource": {
-            "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "  SELECT \n    coalesce(count(distinct Backend.id), 0) as ShutDownNodes\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    (BackendStatus.status in (\"SHUTDOWN\") and BackendGroup.name in ($BackendGroup)) OR  (DeviceStatus.status = \"SHUTDOWN\" and BackendGroup.name in ($BackendGroup))",
+          "rawSql": "SELECT sum(CASE WHEN device_count >= 8 THEN 1 ELSE 0 END) as StandbyNodes\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
           "refId": "A",
           "sql": {
             "columns": [
@@ -539,7 +382,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -588,7 +431,7 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
@@ -620,7 +463,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -770,7 +613,7 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
@@ -802,7 +645,7 @@
     {
       "datasource": {
         "type": "mysql",
-        "uid": "${DS_SDAMANAGER}"
+        "uid": "PF7ED16007B963CF0"
       },
       "fieldConfig": {
         "defaults": {
@@ -963,7 +806,7 @@
           "dataset": "moreh_master",
           "datasource": {
             "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "uid": "PF7ED16007B963CF0"
           },
           "editorMode": "code",
           "format": "table",
@@ -999,10 +842,14 @@
   "templating": {
     "list": [
       {
-        "current": {},
+        "current": {
+          "selected": false,
+          "text": "default_backend_group",
+          "value": "default_backend_group"
+        },
         "datasource": {
           "type": "mysql",
-          "uid": "${DS_SDAMANAGER}"
+          "uid": "PF7ED16007B963CF0"
         },
         "definition": "select distinct name from moreh_master.BackendGroup",
         "hide": 0,
@@ -1027,6 +874,6 @@
   "timezone": "",
   "title": "Job DashBoard",
   "uid": "ebebf455-11c3-44f9-88ac-8ee9492d6a98",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }
