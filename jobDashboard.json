@@ -137,8 +137,68 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT sum(device_count) as AvailableDevices\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
+          "rawSql": "SELECT coalesce(sum(device_count), 0) as AvailableDevices\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
           "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "dataset": "moreh_master",
+          "datasource": {
+            "type": "mysql",
+            "uid": "PF7ED16007B963CF0"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": " SELECT \n    coalesce(count(distinct Device.id), 0) as RunningDevices\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"PROCESSING\" and BackendGroup.name in ($BackendGroup)",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "dataset": "moreh_master",
+          "datasource": {
+            "type": "mysql",
+            "uid": "PF7ED16007B963CF0"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "  select coalesce(sum(nodes_count), 0) * 8 as ShutDownDevices\n  from (\n    select BackNode, status, case when sum(nodes) > 1 then 1 else sum(nodes) end as nodes_count\n    from (\n      SELECT distinct concat(\"back\", LPAD(be_id, 3, '0')) as BackNode,\n      Device.idx, 0.125 as nodes, status\n      FROM Device\n      LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n      LEFT JOIN Backend ON Device.be_id = Backend.id\n      LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n      WHERE BackendGroup.name in ($BackendGroup)) as A\n    group by 1,2\n    having status = 'SHUTDOWN'\n    UNION\n    select distinct host as BackNode, status, 1 as nodes_count\n    from Backend\n    LEFT JOIN BackendStatus ON Backend.stat_id = BackendStatus.id\n    LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n    where status = 'SHUTDOWN' and BackendGroup.name in ($BackendGroup)) as B\n",
+          "refId": "C",
           "sql": {
             "columns": [
               {
@@ -356,8 +416,68 @@
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT sum(CASE WHEN device_count >= 8 THEN 1 ELSE 0 END) as StandbyNodes\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
+          "rawSql": "SELECT coalesce(sum(CASE WHEN device_count >= 8 THEN 1 ELSE 0 END), 0) as StandbyNodes\nFROM ( SELECT \n    Backend.id as be_id, count(Device.id) as device_count\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"IDLE\" and BackendGroup.name in ($BackendGroup)\n  GROUP BY Backend.id\n) AS A",
           "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "dataset": "moreh_master",
+          "datasource": {
+            "type": "mysql",
+            "uid": "PF7ED16007B963CF0"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": " SELECT \n    coalesce(count(distinct Backend.id), 0) as RunningNodes\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    BackendStatus.status in (\"ACTIVE\") and DeviceStatus.status = \"PROCESSING\" and BackendGroup.name in ($BackendGroup)",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "dataset": "moreh_master",
+          "datasource": {
+            "type": "mysql",
+            "uid": "PF7ED16007B963CF0"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "  SELECT \n    coalesce(count(distinct Backend.id), 0) as ShutDownNodes\n  FROM Device\n  LEFT JOIN DeviceStatus ON Device.stat_id = DeviceStatus.id\n  LEFT JOIN Backend on Device.be_id = Backend.id\n  LEFT JOIN BackendStatus ON BackendStatus.id = Backend.stat_id\n  LEFT JOIN BackendGroup ON Backend.group_id = BackendGroup.id\n  WHERE\n    (BackendStatus.status in (\"SHUTDOWN\") and BackendGroup.name in ($BackendGroup)) OR  (DeviceStatus.status = \"SHUTDOWN\" and BackendGroup.name in ($BackendGroup))",
+          "refId": "C",
           "sql": {
             "columns": [
               {
@@ -874,6 +994,6 @@
   "timezone": "",
   "title": "Job DashBoard",
   "uid": "ebebf455-11c3-44f9-88ac-8ee9492d6a98",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
