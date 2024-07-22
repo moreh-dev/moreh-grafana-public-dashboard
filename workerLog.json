@@ -1,144 +1,103 @@
 {
-    "__inputs": [
+  "annotations": {
+    "list": [
       {
-        "name": "DS_LOKI",
-        "label": "loki",
-        "description": "",
-        "type": "datasource",
-        "pluginId": "loki",
-        "pluginName": "Loki"
-      },
-      {
-        "name": "DS_SDAMANAGER",
-        "label": "SDAManager",
-        "description": "",
-        "type": "datasource",
-        "pluginId": "mysql",
-        "pluginName": "MySQL"
-      }
-    ],
-    "__elements": {},
-    "__requires": [
-      {
-        "type": "grafana",
-        "id": "grafana",
-        "name": "Grafana",
-        "version": "10.4.1"
-      },
-      {
-        "type": "panel",
-        "id": "logs",
-        "name": "Logs",
-        "version": ""
-      },
-      {
-        "type": "datasource",
-        "id": "loki",
-        "name": "Loki",
-        "version": "1.0.0"
-      },
-      {
-        "type": "datasource",
-        "id": "mysql",
-        "name": "MySQL",
-        "version": "1.0.0"
-      }
-    ],
-    "annotations": {
-      "list": [
-        {
-          "builtIn": 1,
-          "datasource": {
-            "type": "grafana",
-            "uid": "-- Grafana --"
-          },
-          "enable": true,
-          "hide": true,
-          "iconColor": "rgba(0, 211, 255, 1)",
-          "name": "Annotations & Alerts",
-          "type": "dashboard"
-        }
-      ]
-    },
-    "editable": true,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": null,
-    "links": [],
-    "liveNow": false,
-    "panels": [
-      {
+        "builtIn": 1,
         "datasource": {
-          "type": "loki",
-          "uid": "${DS_LOKI}"
+          "type": "grafana",
+          "uid": "-- Grafana --"
         },
-        "gridPos": {
-          "h": 30,
-          "w": 24,
-          "x": 0,
-          "y": 0
-        },
-        "id": 2,
-        "options": {
-          "dedupStrategy": "none",
-          "enableLogDetails": true,
-          "prettifyLogMessage": false,
-          "showCommonLabels": false,
-          "showLabels": false,
-          "showTime": false,
-          "sortOrder": "Ascending",
-          "wrapLogMessage": false
-        },
-        "targets": [
-          {
-            "datasource": {
-              "type": "loki",
-              "uid": "${DS_LOKI}"
-            },
-            "editorMode": "builder",
-            "expr": "{filename=\"$WorkerFilePath\"} |= ``",
-            "queryType": "range",
-            "refId": "A"
-          }
-        ],
-        "title": "Worker Log - Loki",
-        "type": "logs"
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
       }
-    ],
-    "refresh": "",
-    "schemaVersion": 39,
-    "tags": [],
-    "templating": {
-      "list": [
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "358a98f6-22f0-4d78-ba42-b7491a489bae"
+      },
+      "gridPos": {
+        "h": 30,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": false,
+        "sortOrder": "Ascending",
+        "wrapLogMessage": false
+      },
+      "targets": [
         {
-          "current": {},
           "datasource": {
-            "type": "mysql",
-            "uid": "${DS_SDAMANAGER}"
+            "type": "loki",
+            "uid": "358a98f6-22f0-4d78-ba42-b7491a489bae"
           },
-          "definition": "select concat(\"/home/moreh/logs/frontend/moreh_worker.\", fe_id, \".log\") from JobHistory where request_time is not null and $__timeFilter(JobHistory.end_time)",
-          "hide": 0,
-          "includeAll": false,
-          "multi": false,
-          "name": "WorkerFilePath",
-          "options": [],
-          "query": "select concat(\"/home/moreh/logs/frontend/moreh_worker.\", fe_id, \".log\") from JobHistory where request_time is not null and $__timeFilter(JobHistory.end_time)",
-          "refresh": 1,
-          "regex": "",
-          "skipUrlSync": false,
-          "sort": 0,
-          "type": "query"
+          "editorMode": "builder",
+          "expr": "{filename=\"$WorkerFilePath\"}",
+          "queryType": "range",
+          "refId": "A"
         }
-      ]
-    },
-    "time": {
-      "from": "now-24h",
-      "to": "now"
-    },
-    "timepicker": {},
-    "timezone": "",
-    "title": "Worker Logs",
-    "uid": "f3670fe7-60c3-4267-b3a8-2ea5f910a83f",
-    "version": 2,
-    "weekStart": ""
-  }
+      ],
+      "title": "Worker Log - Loki",
+      "type": "logs"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 39,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "/home/moreh/logs/frontend/moreh_worker.1.log",
+          "value": "/home/moreh/logs/frontend/moreh_worker.1.log"
+        },
+        "datasource": {
+          "type": "mysql",
+          "uid": "PF7ED16007B963CF0"
+        },
+        "definition": "select concat(\"/home/moreh/logs/frontend/moreh_worker.\", fe_id, \".log\") from JobHistory where request_time is not null and $__timeFilter(JobHistory.end_time)",
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "WorkerFilePath",
+        "options": [],
+        "query": "select concat(\"/home/moreh/logs/frontend/moreh_worker.\", fe_id, \".log\") from JobHistory where request_time is not null and $__timeFilter(JobHistory.end_time)",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "Worker Logs",
+  "uid": "f3670fe7-60c3-4267-b3a8-2ea5f910a83f",
+  "version": 4,
+  "weekStart": ""
+}
